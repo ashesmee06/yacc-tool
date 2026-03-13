@@ -1,39 +1,51 @@
 %{
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 
 int yylex();
 void yyerror(char *s);
 %}
 
-%token NUMBER
+%token INT ID NUM
 
 %%
 
-expr: expr '+' expr { printf("Result = %d\n", $1 + $3); }
-    | NUMBER
+program:
+        program stmt
+        |
+        ;
+
+stmt:
+      INT ID ';'        { printf("Valid declaration\n"); }
+    | ID '=' NUM ';'    { printf("Valid assignment\n"); }
     ;
 
 %%
 
-int yylex() {
-    int c;
-    c = getchar();
-
-    if (isdigit(c)) {
-        yylval = c - '0';
-        return NUMBER;
-    }
-
-    return c;
+void yyerror(char *s){
+    printf("Syntax Error\n");
 }
 
-void yyerror(char *s) {
-    printf("Error\n");
-}
-
-int main() {
-    printf("Enter expression (example: 3+4)\n");
+int main(){
+    printf("Enter C-like statement:\n");
     yyparse();
     return 0;
+}
+
+int yylex(){
+    char c = getchar();
+
+    if(c=='i'){
+        getchar(); getchar();   // nt
+        return INT;
+    }
+
+    if(isalpha(c))
+        return ID;
+
+    if(isdigit(c))
+        return NUM;
+
+    return c;
 }
